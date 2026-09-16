@@ -1,0 +1,85 @@
+flowchart TB
+    subgraph Clients["CLIENT APPS"]
+        MOB["Mobile App<br/>(Parent + Teacher)<br/>Flutter"]
+        DESK["Desktop App<br/>(Admin)<br/>Tauri / Electron"]
+    end
+
+    GW["API Gateway<br/>(Kong / NestJS Gateway)<br/>Routing, rate limit, TLS"]
+
+    subgraph Core["CORE MICROSERVICES"]
+        AUTH["Auth Service<br/>(REUSABLE)<br/>JWT, OAuth2, RBAC"]
+        LIC["License Service<br/>MAC/HW fingerprint<br/>activation & validation"]
+        USER["User/Profile Service"]
+        CHILD["Child Service"]
+        CLASS["Classroom Service"]
+        ATT["Attendance Service"]
+        MSG["Messaging/Chat Service"]
+        BILL["Billing Service<br/>Stripe/PayPal"]
+        MEDIA["Media/Gallery Service"]
+        REPORT["Daily Report Service"]
+    end
+
+    NOTIF["Notification Service<br/>(REUSABLE)<br/>Push / Email / SMS"]
+
+    subgraph AI["AI LAYER (Python)"]
+        AIGW["AI Orchestrator<br/>FastAPI"]
+        CHATBOT["Parent Chatbot<br/>(LLM + RAG)"]
+        NLP["NLP: report summarizer<br/>sentiment on notes"]
+        VISION["Vision: photo tagging<br/>optional face-match check-in"]
+        ANOMALY["Anomaly detection<br/>attendance/health patterns"]
+    end
+
+    BROKER["Message Broker<br/>Kafka / RabbitMQ<br/>(async events)"]
+
+    subgraph Data["DATA LAYER"]
+        PG[("PostgreSQL<br/>core relational data")]
+        MONGO[("MongoDB<br/>chat, logs, AI outputs")]
+        REDIS[("Redis<br/>cache, sessions")]
+        S3[("Object Storage<br/>MinIO/S3 - photos, docs")]
+        VDB[("Vector DB<br/>Pinecone/pgvector<br/>for chatbot RAG")]
+    end
+
+    MOB --> GW
+    DESK --> GW
+    GW --> AUTH
+    GW --> LIC
+    GW --> USER
+    GW --> CHILD
+    GW --> CLASS
+    GW --> ATT
+    GW --> MSG
+    GW --> BILL
+    GW --> MEDIA
+    GW --> REPORT
+    GW --> AIGW
+
+    AUTH --> PG
+    AUTH --> REDIS
+    LIC --> PG
+    USER --> PG
+    CHILD --> PG
+    CLASS --> PG
+    ATT --> PG
+    BILL --> PG
+    MSG --> MONGO
+    MEDIA --> S3
+    REPORT --> PG
+
+    ATT -. event .-> BROKER
+    REPORT -. event .-> BROKER
+    MSG -. event .-> BROKER
+    BILL -. event .-> BROKER
+    BROKER --> NOTIF
+    BROKER --> AIGW
+
+    AIGW --> CHATBOT
+    AIGW --> NLP
+    AIGW --> VISION
+    AIGW --> ANOMALY
+    CHATBOT --> VDB
+    NLP --> MONGO
+    ANOMALY --> PG
+
+    NOTIF -->|FCM| MOB
+    NOTIF -->|SMTP/SendGrid| MOB
+    NOTIF -->|Twilio SMS| MOB

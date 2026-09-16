@@ -1,0 +1,94 @@
+openapi: 3.0.3
+info:
+  title: Auth service
+  version: "1.0"
+  description: >
+    Tenant, User, Credential, Role, Permission, Session. Domain-agnostic —
+    see CLAUDE.md §5 extraction discipline.
+paths:
+  /v1/tenants:
+    post:
+      operationId: bootstrapTenant
+      summary: Bootstrap a new tenant with its first ADMIN user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTenantRequest"
+      responses:
+        "201":
+          description: Tenant and its first ADMIN user were created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TenantBootstrapResponse"
+        "400":
+          description: Validation error (RFC 7807 problem+json)
+  /v1/auth/login:
+    post:
+      operationId: login
+      summary: Authenticate with email + password and issue tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid email or password (RFC 7807 problem+json)
+components:
+  schemas:
+    CreateTenantRequest:
+      type: object
+      required: [tenantName, adminEmail, adminPassword]
+      properties:
+        tenantName:
+          type: string
+          minLength: 2
+        adminEmail:
+          type: string
+          format: email
+        adminPassword:
+          type: string
+          minLength: 8
+    TenantBootstrapResponse:
+      type: object
+      required: [tenantId, adminUserId]
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+        adminUserId:
+          type: string
+          format: uuid
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+    LoginResponse:
+      type: object
+      required: [accessToken, refreshToken, expiresIn]
+      properties:
+        accessToken:
+          type: string
+          description: Short-lived RS256 JWT (sub, tenantId, role claims).
+        refreshToken:
+          type: string
+          description: Opaque, long-lived. Stored server-side as a salted hash only.
+        expiresIn:
+          type: integer
+          description: Access token lifetime in seconds.

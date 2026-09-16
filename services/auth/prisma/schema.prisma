@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  users     User[]
+
+  @@map("tenants")
+}
+
+// Roles are seeded rows, not enums (CLAUDE.md §5) — "ADMIN"/"TEACHER"/"PARENT"
+// live here as data, never as a TypeScript enum.
+model Role {
+  id    String @id @default(uuid())
+  name  String @unique
+  users User[]
+
+  @@map("roles")
+}
+
+model User {
+  id         String      @id @default(uuid())
+  tenantId   String
+  tenant     Tenant      @relation(fields: [tenantId], references: [id])
+  email      String
+  roleId     String
+  role       Role        @relation(fields: [roleId], references: [id])
+  credential Credential?
+  sessions   Session[]
+  createdAt  DateTime    @default(now())
+
+  @@unique([tenantId, email])
+  @@map("users")
+}
+
+model Credential {
+  id           String @id @default(uuid())
+  userId       String @unique
+  user         User   @relation(fields: [userId], references: [id])
+  passwordHash String
+
+  @@map("credentials")
+}
+
+model Session {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  refreshTokenHash String   @unique
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  @@map("sessions")
+}

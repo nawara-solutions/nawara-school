@@ -1,0 +1,167 @@
+classDiagram
+    class User {
+        <<abstract>>
+        +UUID id
+        +string email
+        +string passwordHash
+        +string phone
+        +Role role
+        +DateTime createdAt
+        +bool isActive
+        login()
+        resetPassword()
+    }
+
+    class Admin {
+        +string[] permissions
+        manageStaff()
+        manageBilling()
+        viewAnalytics()
+    }
+
+    class Teacher {
+        +UUID classroomId
+        +string[] subjects
+        checkInChild()
+        writeDailyReport()
+        sendMessage()
+    }
+
+    class Parent {
+        +UUID[] childrenIds
+        viewChild()
+        payInvoice()
+        chatWithTeacher()
+        askAIAssistant()
+    }
+
+    class Child {
+        +UUID id
+        +string firstName
+        +string lastName
+        +Date dob
+        +UUID classroomId
+        +UUID[] parentIds
+        +string allergies
+        +string medicalNotes
+        +string emergencyContact
+    }
+
+    class Classroom {
+        +UUID id
+        +string name
+        +UUID[] teacherIds
+        +int capacity
+        +string ageGroup
+    }
+
+    class Attendance {
+        +UUID id
+        +UUID childId
+        +Date date
+        +DateTime checkInTime
+        +DateTime checkOutTime
+        +UUID checkedInBy
+        +UUID checkedOutBy
+        +CheckMethod method
+    }
+
+    class DailyReport {
+        +UUID id
+        +UUID childId
+        +Date date
+        +string meals
+        +string naps
+        +string activities
+        +string mood
+        +string teacherNotes
+        +string aiSummary
+        generateAISummary()
+    }
+
+    class MediaItem {
+        +UUID id
+        +UUID[] childIds
+        +string url
+        +MediaType type
+        +UUID uploadedBy
+        +string[] aiTags
+        +DateTime timestamp
+    }
+
+    class Message {
+        +UUID id
+        +UUID senderId
+        +UUID receiverId
+        +UUID threadId
+        +string content
+        +DateTime timestamp
+        +bool aiTranslated
+    }
+
+    class Notification {
+        +UUID id
+        +UUID recipientId
+        +NotifType type
+        +Channel channel
+        +string content
+        +Status status
+        +DateTime sentAt
+        send()
+    }
+
+    class Invoice {
+        +UUID id
+        +UUID parentId
+        +decimal amount
+        +Date dueDate
+        +InvoiceStatus status
+        +LineItem[] items
+    }
+
+    class Payment {
+        +UUID id
+        +UUID invoiceId
+        +decimal amount
+        +string method
+        +string transactionId
+        +DateTime date
+    }
+
+    class License {
+        +UUID id
+        +string deviceHash
+        +string macAddress
+        +string appVersion
+        +Date expiryDate
+        +LicenseStatus status
+        +DateTime activationDate
+        validate()
+        revoke()
+    }
+
+    class AIInsight {
+        +UUID id
+        +InsightType type
+        +UUID relatedEntityId
+        +json payload
+        +float confidence
+        +DateTime generatedAt
+    }
+
+    User <|-- Admin
+    User <|-- Teacher
+    User <|-- Parent
+    Parent "1" --> "*" Child : parent of
+    Classroom "1" --> "*" Child : enrolled in
+    Classroom "*" --> "*" Teacher : assigned to
+    Child "1" --> "*" Attendance
+    Child "1" --> "*" DailyReport
+    Child "1" --> "*" MediaItem
+    Parent "1" --> "*" Invoice
+    Invoice "1" --> "*" Payment
+    User "1" --> "*" Notification : recipient
+    User "1" --> "*" Message : sends/receives
+    DailyReport ..> AIInsight : analyzed by
+    Attendance ..> AIInsight : analyzed by
+    MediaItem ..> AIInsight : tagged by
