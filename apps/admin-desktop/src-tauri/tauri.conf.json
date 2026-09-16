@@ -1,0 +1,26 @@
+{
+  "productName": "school-admin-desktop",
+  "version": "0.1.0",
+  "identifier": "com.school.admin-desktop",
+  "build": {
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "pnpm exec vite",
+    "frontendDist": "../dist",
+    "beforeBuildCommand": "pnpm exec vite build"
+  },
+  "app": {
+    "security": {
+      "csp": null
+    },
+    "windows": [
+      {
+        "title": "School Admin",
+        "width": 1024,
+        "height": 720
+      }
+    ]
+  },
+  "bundle": {
+    "active": true
+  }
+}

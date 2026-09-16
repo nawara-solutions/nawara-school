@@ -1,0 +1,6 @@
+{
+  "name": "@school/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Source of truth: OpenAPI specs, event schemas, shared TS types (CLAUDE.md §5.3)."
+}

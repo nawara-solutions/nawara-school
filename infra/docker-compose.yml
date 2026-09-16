@@ -1,0 +1,28 @@
+# Full local stack (CLAUDE.md §2). Docker Compose until Phase 4.
+# One Postgres container, one database per service (dev convenience only —
+# CLAUDE.md §3: never a cross-service join or foreign key regardless).
+# Credentials come from infra/.env (copy infra/.env.example, gitignored —
+# CLAUDE.md §6.10). Run: docker compose -f infra/docker-compose.yml --env-file infra/.env up
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-daycare}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-daycare}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+volumes:
+  pgdata:

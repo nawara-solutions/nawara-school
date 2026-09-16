@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Narrow allowlist: no shell access, no broad fs scopes (CLAUDE.md §10).",
+  "windows": ["main"],
+  "permissions": []
+}
