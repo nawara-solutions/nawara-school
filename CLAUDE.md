@@ -9,7 +9,7 @@
 ## 0. Shared AI-Agent Workflow Standard
 
 Branch naming, commit message format, PR conventions, and the ADR/ADD/SDD/TDD design-doc
-process are defined once for all Nawara Solution projects in
+process are defined once for all Nawara Solutions projects in
 [`../ai-standard/README.md`](../ai-standard/README.md). This repo's `/branch`, `/commit`,
 `/pr`, `/design-doc` commands and its `design-conformance`/`docs-writer` agents are symlinks
 into that shared source — editing one of them from here edits it for `nawara-core` and
@@ -73,7 +73,7 @@ contracts, config, mobile, admin-desktop, infra. Do not scaffold directories for
 ## 2b. Related repos
 
 `/home/anwar/Desktop/nawara-solutions/nawara-core` is a **separate, early-stage** Nawara
-Solution repo scaffolding generic, org-wide shared services (auth, notification, payment,
+Solutions repo scaffolding generic, org-wide shared services (auth, notification, payment,
 AI). It is **not a current dependency of daycare** — daycare's `auth`, `notification`, and
 `license` services (§5) are intentionally self-contained today. `nawara-core` is the
 eventual shared-service destination for the org: relevant context if/when the Phase-4
@@ -81,7 +81,7 @@ eventual shared-service destination for the org: relevant context if/when the Ph
 not something to wire up unprompted.
 
 `/home/anwar/Desktop/nawara-solutions/nawara-drive` is a separate, unrelated Nawara
-Solution product (driving-school platform). Don't explore or reference it when working in
+Solutions product (driving-school platform). Don't explore or reference it when working in
 this repo.
 
 ---
